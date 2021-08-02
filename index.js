@@ -17,17 +17,31 @@ app.get('/', (req, res) => {
 
 // socket.io listens for a 'connection' type and 
 // logs to let us know someone connected
-io.use((socket, next) => {
-    const username=socket.handshake.auth.username;
-    if (!username){
-        return next(new Error("invalid username"))
-    }
-    // setting this up for instances where we want to 
-    // ban users in the future
-    if (username === "badUser"){
-        return next(new Error("invalid username"))
-    }
-    console.log(`${username} has connected`)
+// disabling for now to practice structuring with socket.on
+// io.use((socket, next) => {
+//     const username=socket.handshake.auth.username;
+//     if (!username){
+//         return next(new Error("invalid username"))
+//     }
+//     // setting this up for instances where we want to 
+//     // ban users in the future
+//     if (username === "badUser"){
+//         return next(new Error("invalid username"))
+//     }
+//     console.log(`${username} has connected`)
+// })
+
+io.on("connection", socket => {
+    socket.on("send-message", message => {
+        console.log(message)
+    })
+    socket.on("connect", () => {
+        const username=socket.handshake.auth.username;
+        if (!username){
+            return next(new Error("invalid username"))
+        }
+        console.log(`${username} has connected`)
+    })
 })
 
 server.listen(PORT, () => {
