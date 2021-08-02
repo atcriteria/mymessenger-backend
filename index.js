@@ -12,6 +12,9 @@ app.get('/', (req, res) => {
 // socket.io listens for a 'connection' type and 
 // logs to let us know someone connected
 io.on('connection', (socket) => {
+    socket.on('new-operations', (data) =>{
+        io.emit("new-remote-operations", data)
+    })
     console.log("A user connected")
 })
 
