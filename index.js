@@ -17,7 +17,13 @@ app.get('/', (req, res) => {
 
 io.on("connection", socket => {
     socket.on("send-message", message => {
+        // socket.broadcast sends the message to all clients
+        // that are NOT the originator. Calling socket.emit
+        // will send it to all clients, even the client that
+        // initiated the message.
+        // socket.broadcast.emit("received-message", message)
         console.log(message)
+        io.emit("receive-message", message)
     })
     socket.on("connect", () => {
         const username=socket.handshake.auth.username;
