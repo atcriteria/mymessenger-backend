@@ -39,7 +39,7 @@ const processMessages = message => {
 // We don't need this but I'll leave it in for now
 // just to have some output in the browser
 app.get('/', (req, res) => {
-    res.send('<h1>Hello World</h1>');
+    res.send('<h1>Greetings, adventurer!</h1>\n<p>I think you took a wrong turn back there, were you looking for: <a>https://bad-messenger.herokuapp.com/</a></p>');
 })
 
 io.on("connection", socket => {
