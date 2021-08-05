@@ -21,9 +21,13 @@ io.on("connection", socket => {
         // that are NOT the originator. Calling socket.emit
         // will send it to all clients, even the client that
         // initiated the message.
-        // socket.broadcast.emit("received-message", message)
+        // socket.broadcast.emit("receive-message", message)
         console.log(message)
         io.emit("receive-message", message)
+    })
+    socket.on("send-admin-message", message => {
+        console.log(`<ADMIN MESSAGE> ${message.message}`)
+        io.emit("admin-message", message)
     })
     socket.on("connect", () => {
         const username=socket.handshake.auth.username;
