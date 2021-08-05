@@ -9,6 +9,13 @@ const io = require('socket.io')(server, {
 });
 const PORT = process.env.PORT || 3333
 
+let historyOfMessages = []
+
+const pruneMessages = messages => {
+    let savedMessages = messages.slice(24)
+    historyOfMessages = [...savedMessages]
+}
+
 // We don't need this but I'll leave it in for now
 // just to have some output in the browser
 app.get('/', (req, res) => {
@@ -21,20 +28,28 @@ io.on("connection", socket => {
         // that are NOT the originator. Calling socket.emit
         // will send it to all clients, even the client that
         // initiated the message.
-        // socket.broadcast.emit("receive-message", message)
-        console.log(message)
+        // socket.broadcast.emit("receive-message", message))
+        if(!message.adminMessage){
+            historyOfMessages.push(message)
+        }
+        if(historyOfMessages.length >= 50){
+            pruneMessages(historyOfMessages)
+        }
         io.emit("receive-message", message)
     })
     socket.on("send-admin-message", message => {
-        console.log(`<ADMIN MESSAGE> ${message.message}`)
+        console.log(`<SYSTEM> ${message.message}`)
         io.emit("admin-message", message)
     })
-    socket.on("connect", () => {
+    io.on("connect", (socket) => {
         const username=socket.handshake.auth.username;
         if (!username){
             return next(new Error("invalid username"))
+        } else {
+            let id = socket.id;
+            console.log(username)
+            io.to(id).emit("receive-message", historyOfMessages)
         }
-        console.log(`${username} has connected`)
     })
 })
 
