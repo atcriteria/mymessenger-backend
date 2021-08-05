@@ -15,6 +15,25 @@ const pruneMessages = messages => {
     let savedMessages = messages.slice(24)
     historyOfMessages = [...savedMessages]
 }
+// Takes an incoming message and looks at
+// the message history to see if the previous
+// message is from the same author, and if so
+// then we append it to their messages.
+const processMessages = message => {
+    if(historyOfMessages.length > 1){
+        let previousMessage = historyOfMessages[historyOfMessages.length-2];
+        let currentMessage = historyOfMessages[historyOfMessages.length-1];
+        if(previousMessage.username === currentMessage.username){
+            // We are pointing to the same reference point so we are
+            // mutating the historyOfMessages object with this push.
+            // Because it is mutable we don't have to make a fresh copy.
+            previousMessage.message.push(message.message[0])
+            historyOfMessages.pop()
+        } else {
+            return
+        }
+    }
+}
 
 // We don't need this but I'll leave it in for now
 // just to have some output in the browser
@@ -32,6 +51,7 @@ io.on("connection", socket => {
         if(!message.adminMessage){
             historyOfMessages.push(message)
         }
+        processMessages(message)
         if(historyOfMessages.length >= 50){
             pruneMessages(historyOfMessages)
         }
@@ -46,9 +66,14 @@ io.on("connection", socket => {
         if (!username){
             return next(new Error("invalid username"))
         } else {
-            let id = socket.id;
-            console.log(username)
-            io.to(id).emit("receive-message", historyOfMessages)
+            if(historyOfMessages.length === 0){
+                return
+            } else {
+                let id = socket.id;
+                console.log("message history:")
+                console.log(historyOfMessages)
+                io.to(id).emit("receive-message", historyOfMessages)
+            }
         }
     })
 })
