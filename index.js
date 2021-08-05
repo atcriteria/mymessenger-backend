@@ -14,6 +14,7 @@ let historyOfMessages = []
 const pruneMessages = messages => {
     let savedMessages = messages.slice(24)
     historyOfMessages = [...savedMessages]
+    console.log("Pruned history")
 }
 // Takes an incoming message and looks at
 // the message history to see if the previous
@@ -70,8 +71,6 @@ io.on("connection", socket => {
                 return
             } else {
                 let id = socket.id;
-                console.log("message history:")
-                console.log(historyOfMessages)
                 io.to(id).emit("receive-message", historyOfMessages)
             }
         }
